@@ -1,167 +1,125 @@
-# zaimu
+# **Zaimu**  
+A way to help you save money and manage your expenses based on the **Kakeibo** method.
 
-A way to help you save money and manage your expenses based on the Kakeibo method
----
-
-### Main goals:
-
-- **Income & Expense Logging** – Users manually input transactions or connect to financial accounts via **secure integrations**.
-- **Categorization & Reflection** – Divide expenses into **needs, wants, savings, and unexpected costs**, mirroring Kakeibo’s approach.
-- **Budget Insights & Predictions** – Visualizations to help users **track spending trends**
-- **Reminders & Accountability** – Notifications prompting users to **reflect on their spending habits** before over-extending themself.
-- **Goalsetting & Reflection** - How much money do you have?, How much do you want to save?, How much are you spending?, How can you improve?
-	
-- **Data Encryption & Privacy Controls** – Secure storage using **end-to-end encryption**, ensuring financial data remains private.
-
-### **🔹 Tech Stack Overview**
-- **Frontend:** HTML, JavaScript (Vanilla or Svelte for a more dynamic UI)
-- **Backend:** PocketBase (self-hosted lightweight backend)
-- **Security:** End-to-end encryption for sensitive data
-- **Storage:** SQLite (PocketBase’s default), ensuring local-first operations
-- **Notifications:** Webhooks for reminders, cron-like scheduling
+### **Main Goals:**
+- **Income & Expense Logging** – Users manually input transactions.
+- **Categorization & Reflection** – Divide expenses into **needs, wants, savings, and unexpected costs**, mirroring Kakeibo.
+- **Budget Insights & Predictions** – Visualizing spending trends.
+- **Reminders & Accountability** – Notifications prompting users to reflect on spending before over-extending.
+- **Goal Setting & Reflection** – Encouraging mindful budgeting.
+- **Data Encryption & Privacy** – Secure financial data storage using **end-to-end encryption**.
 
 ---
 
-## **🚀 Step 1: Setting Up PocketBase**
-### **1️⃣ Install & Initialize PocketBase**
-PocketBase serves as both your database and backend. Get started with:
-
-```sh
-wget https://github.com/pocketbase/pocketbase/releases/latest/download/pocketbase-linux-arm64.zip
-unzip pocketbase-linux-arm64.zip
-./pocketbase serve
+## 🚀 **Step 1: Setting Up the Dockerized Application**
+### **1️⃣ Define the Project Structure**
+```plaintext
+zaimu/
+ ├── docker-compose.yml
+ ├── app/
+ │   ├── server.js
+ │   ├── database.sqlite
+ │   ├── public/
+ │   │   ├── index.html
+ │   │   ├── styles.css
+ │   │   ├── script.js
 ```
 
-Once running, visit `localhost:8090` for the admin panel.
-
----
-
-### **2️⃣ Define PocketBase Collections**
-You’ll need collections for:
-1. **Users** → Authentication, roles
-2. **Transactions** → Expense & income tracking
-3. **Categories** → Needs, wants, savings, unexpected costs
-4. **Reflections** → Monthly summaries, goal setting
-
-Example **Transactions Schema**:
-| Field Name  | Type      | Description |
-|-------------|----------|-------------|
-| `amount`   | Number    | Expense/income value |
-| `type`      | Enum      | `income` or `expense` |
-| `category`  | Relation | Link to `Categories` |
-| `date`      | Date      | Transaction timestamp |
-
----
-
-## **🖼 Step 2: Building the Frontend**
-### **3️⃣ Setting Up HTML & JavaScript**
-Simple input form:
-
-```html
-<form id="expenseForm">
-  <input type="number" id="amount" placeholder="Enter amount" required>
-  <select id="type">
-    <option value="income">Income</option>
-    <option value="expense">Expense</option>
-  </select>
-  <select id="category">
-    <option value="needs">Needs</option>
-    <option value="wants">Wants</option>
-    <option value="savings">Savings</option>
-    <option value="unexpected">Unexpected</option>
-  </select>
-  <button type="submit">Add Transaction</button>
-</form>
+### **2️⃣ Create the `docker-compose.yml`**
+```yaml
+version: '3'
+services:
+  zaimu:
+    build: .
+    container_name: zaimu_container
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./database:/app/database
+    restart: unless-stopped
 ```
 
-Basic JavaScript to **send data to PocketBase**:
+---
+
+## 🛠 **Step 2: Implementing SQLite for Storage**
+### **3️⃣ Define the Database Schema**
+```sql
+CREATE TABLE transactions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    amount REAL NOT NULL,
+    type TEXT NOT NULL,
+    category TEXT NOT NULL,
+    date TEXT NOT NULL
+);
+```
+
+### **4️⃣ Insert Transaction Data**
 ```javascript
-document.getElementById("expenseForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    
-    const data = {
-        amount: document.getElementById("amount").value,
-        type: document.getElementById("type").value,
-        category: document.getElementById("category").value,
-        date: new Date().toISOString()
-    };
+const sqlite3 = require('sqlite3').verbose();
+const db = new sqlite3.Database('./database.sqlite');
 
-    const response = await fetch("http://localhost:8090/api/collections/transactions/records", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    });
+db.run(`INSERT INTO transactions (amount, type, category, date) VALUES (?, ?, ?, ?)`,
+      [amount, type, category, new Date().toISOString()]);
+```
 
-    if (response.ok) {
-        alert("Transaction saved!");
-    } else {
-        alert("Error saving transaction");
-    }
+---
+
+## 📊 **Step 3: Budget Insights & Visualization**
+### **5️⃣ Fetch & Analyze Transactions**
+```javascript
+db.all("SELECT * FROM transactions", [], (err, rows) => {
+    console.log(rows);  // Use this data for charts
 });
 ```
----
 
-## **📊 Step 3: Budget Insights & Predictions**
-### **4️⃣ Fetching & Visualizing Data**
-Using Chart.js or D3.js to create spending trend graphs.
+### **6️⃣ Generate Spending Trends**
+- Use **Chart.js** or **D3.js** to create interactive graphs.
+- Aggregate transactions to **visualize spending habits**.
+- Predict potential **overspending risks** based on historical data.
 
+Example **monthly spending breakdown**:
 ```javascript
-async function fetchTransactions() {
-    const response = await fetch("http://localhost:8090/api/collections/transactions/records");
-    const data = await response.json();
-    console.log(data);
-}
-
-fetchTransactions();
+const monthlyData = transactions.reduce((acc, txn) => {
+    const month = txn.date.slice(0, 7);  // Extract YYYY-MM format
+    acc[month] = (acc[month] || 0) + txn.amount;
+    return acc;
+}, {});
+console.log(monthlyData);
 ```
-You can use this data to **plot trends** based on spending habits.
 
 ---
 
-## **🔒 Step 4: Security & Encryption**
-### **5️⃣ Encrypting User Data Before Storage**
-For privacy, encrypt sensitive financial data before saving it in PocketBase.
-
+## 🔒 **Step 4: Security & Encryption**
+### **7️⃣ Encrypt Sensitive Data**
 ```javascript
-import CryptoJS from "crypto-js";
+const crypto = require('crypto');
+const key = "your-secret-key";
 
-function encryptData(text) {
-    return CryptoJS.AES.encrypt(text, "your-secret-key").toString();
+function encrypt(text) {
+    return crypto.createCipher('aes-256-cbc', key).update(text, 'utf8', 'hex');
 }
 
-function decryptData(cipherText) {
-    return CryptoJS.AES.decrypt(cipherText, "your-secret-key").toString(CryptoJS.enc.Utf8);
+function decrypt(text) {
+    return crypto.createDecipher('aes-256-cbc', key).update(text, 'hex', 'utf8');
 }
 ```
-Use this in transaction storage to ensure security.
+Apply encryption when storing sensitive user information.
 
 ---
 
-## **⏰ Step 5: Reminders & Accountability**
-### **6️⃣ Scheduled Notifications**
-You can trigger alerts via **PocketBase webhooks** or a scheduled cron job.
-
-Example cron job for monthly **budget review reminders**:
-
-```sh
-echo "0 9 1 * * curl -X POST http://localhost:8090/api/sendReminder" | crontab -
-```
+## 🎯 **Step 5: Goal-Setting & Reflection**
+### **8️⃣ Monthly Review Prompts**
+Save structured journal entries in SQLite for **budget awareness**:
+- "How much money do you have?"
+- "How much do you want to save?"
+- "How much are you spending?"
+- "How can you improve?"
 
 ---
 
-## **🎯 Step 6: Goal-Setting & Reflection**
-### **7️⃣ Adding Monthly Reflection Prompts**
-Prompt users:
-- “How much money do you have?”
-- “How much do you want to save?”
-- “How much are you spending?”
-- “How can you improve?”
-
-Save these as journal entries inside PocketBase.
+### 📌 **Next Steps**
+1. **Enhance UI** for seamless financial input.
+2. **Improve visualization for spending trends.**
+3. **Implement reminders for spending habits.**
 
 ---
-
-### **📌 Next Steps**
-1. **Enhance UI** with Svelte or React for better interactivity.
-2. **Connect Authentication** with PocketBase user roles.
-3. **Optimize Reports** using aggregated analytics.
