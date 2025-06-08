@@ -3,6 +3,7 @@ const Database = require("better-sqlite3");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const path = require("path");
+const json2csv = require("json2csv"); 
 
 const app = express();
 const db = new Database("zaimu.sqlite");
@@ -120,6 +121,25 @@ app.get("/get-transactions/:month", (req, res) => {
     `).all(user.id, month);
 
     res.json(transactions);
+});
+
+app.get("/export-csv/:month", (req, res) => {
+    if (!req.session.username) return res.status(401).send("Unauthorized");
+
+    const { month } = req.params;
+    const user = db.prepare("SELECT id FROM users WHERE username = ?").get(req.session.username);
+    
+    const transactions = db.prepare(`
+        SELECT amount, type, category, description, date FROM transactions
+        WHERE user_id = ? AND strftime('%m', date) = ?
+    `).all(user.id, month);
+
+    if (transactions.length === 0) return res.status(404).send("No transactions found.");
+
+    const csv = json2csv.parse(transactions); // Convert transactions to CSV
+    res.setHeader("Content-Disposition", `attachment; filename=expenses_${month}.csv`);
+    res.setHeader("Content-Type", "text/csv");
+    res.send(csv);
 });
 
 

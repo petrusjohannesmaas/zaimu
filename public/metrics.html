@@ -27,6 +27,7 @@
     <h2>Charts</h2>
     <h3>Total Saved: <span id="total-saved"></span></h3>
     <h3>Total Expenses: <span id="total-expenses"></span></h3>
+    <button id="export-btn">Export CSV</button>
     <p id="no-data-message" style="color: red; display: none;">No data for this month.</p>
     <select id="month-selector">
         <option value="01">January</option>
@@ -147,7 +148,10 @@
 
 
 
-
+        document.getElementById("export-btn").addEventListener("click", () => {
+            const selectedMonth = document.getElementById("month-selector").value;
+            window.location.href = `/export-csv/${selectedMonth}`;
+        });
     </script>
 
 </body>
