@@ -1,0 +1,102 @@
+{
+  "Housing": [
+    "Mortgage or rent",
+    "Property taxes",
+    "Household repairs",
+    "HOA fees"
+  ],
+  "Transportation": [
+    "Car payment",
+    "Car warranty",
+    "Gas",
+    "Tires",
+    "Maintenance and oil changes",
+    "Parking fees",
+    "Repairs",
+    "Registration and DMV fees"
+  ],
+  "Food": [
+    "Groceries",
+    "Restaurants",
+    "Pet food"
+  ],
+  "Utilities": [
+    "Electricity",
+    "Water",
+    "Garbage",
+    "Phones",
+    "Cable",
+    "Internet"
+  ],
+  "Clothing": [
+    "Adult clothing and shoes",
+    "Children’s clothing and shoes"
+  ],
+  "Medical/Healthcare": [
+    "Primary care",
+    "Dental care",
+    "Specialty care",
+    "Urgent care",
+    "Medications",
+    "Medical devices"
+  ],
+  "Insurance": [
+    "Health insurance",
+    "Homeowner’s or renter’s insurance",
+    "Home warranty or protection plan",
+    "Auto insurance",
+    "Life insurance",
+    "Disability insurance"
+  ],
+  "Household Items/Supplies": [
+    "Toiletries",
+    "Laundry detergent",
+    "Dishwasher detergent",
+    "Cleaning supplies",
+    "Tools"
+  ],
+  "Personal": [
+    "Gym memberships",
+    "Haircuts",
+    "Salon services",
+    "Cosmetics and personal care",
+    "Babysitter",
+    "Subscriptions"
+  ],
+  "Debt": [
+    "Personal loans",
+    "Student loans",
+    "Credit cards"
+  ],
+  "Retirement": [
+    "Financial planning",
+    "Investing"
+  ],
+  "Education": [
+    "Children’s college",
+    "Your college",
+    "School supplies",
+    "Books"
+  ],
+  "Savings": [
+    "Emergency fund",
+    "Big purchases",
+    "Other savings"
+  ],
+  "Gifts/Donations": [
+    "Birthday",
+    "Anniversary",
+    "Wedding",
+    "Christmas",
+    "Special occasions",
+    "Charities"
+  ],
+  "Entertainment": [
+    "Alcohol and bars",
+    "Games",
+    "Movies",
+    "Concerts",
+    "Vacations",
+    "Streaming services"
+  ]
+}

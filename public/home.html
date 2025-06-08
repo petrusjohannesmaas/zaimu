@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Mindset Home</title>
+</head>
+
+<body>
+    <h2>Welcome, <span id="username"></span>!</h2>
+    <h4>Your estimated income: <span id="est_income"></span></h4>
+    <h4>Your savings goal: <span id="savings_goal"></span></h4>
+    <!-- <p>Log your mindset below:</p>
+
+    <form id="postForm">
+        <textarea name="description" placeholder="How are you feeling?" required></textarea>
+        <select name="mood">
+            <option value="1">😞 1 - Very Low</option>
+            <option value="2">😐 2 - Low</option>
+            <option value="3">🙂 3 - Neutral</option>
+            <option value="4">😊 4 - Good</option>
+            <option value="5">😃 5 - Very Good</option>
+        </select>
+        <button type="submit">Save Post</button>
+    </form> -->
+
+    <button onclick="logout()">Log Out</button>
+
+    <script>
+        fetch("/user-info")
+            .then(res => res.json())
+            .then(data => {
+                if (data.username) {
+                    document.getElementById("username").textContent = data.username;
+                    document.getElementById("est_income").textContent = data.est_income;
+                    document.getElementById("savings_goal").textContent = data.savings_goal;
+                } else {
+                    window.location.href = "/login";
+                }
+            });
+
+        // document.getElementById("postForm").addEventListener("submit", async (event) => {
+        //     event.preventDefault();
+        //     const formData = new FormData(event.target);
+        //     const encodedData = new URLSearchParams(formData).toString(); // Encode properly
+
+        //     await fetch("/add-post", {
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/x-www-form-urlencoded" }, // Ensure correct format
+        //         body: encodedData
+        //     });
+
+        //     alert("Post saved!");
+        // });
+
+        function logout() {
+            fetch("/logout", { method: "POST" }).then(() => window.location.href = "/login");
+        }
+    </script>
+</body>

@@ -1,0 +1,26 @@
+{
+  "name": "zaimu",
+  "version": "1.0.0",
+  "description": "A way to help you save money and manage your expenses based on the Kakeibo method.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/petrusjohannesmaas/zaimu.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "GNU GENERAL PUBLIC LICENSE Version 3",
+  "bugs": {
+    "url": "https://github.com/petrusjohannesmaas/zaimu/issues"
+  },
+  "homepage": "https://github.com/petrusjohannesmaas/zaimu#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^11.10.0",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1"
+  }
+}
