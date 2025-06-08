@@ -1,0 +1,14 @@
+---
+services:
+  zaimu:
+    container_name: zaimu-app
+    image: zaimu:v1
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - zaimu-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  zaimu-data:

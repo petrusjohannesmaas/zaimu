@@ -3,10 +3,44 @@ const Database = require("better-sqlite3");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
 const path = require("path");
+const fs = require("fs");
 const json2csv = require("json2csv"); 
-
 const app = express();
-const db = new Database("zaimu.sqlite");
+
+const dbFile = "/app/data/zaimu.sqlite";
+
+// Ensure the SQLite file exists before opening it
+if (!fs.existsSync(dbFile)) {
+    console.log("Database file not found. Creating new database...");
+    fs.writeFileSync(dbFile, "");
+}
+
+// Initialize the database
+const db = new Database(dbFile);
+
+// Create tables if they don’t exist
+db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        est_income REAL NOT NULL,
+        savings_goal REAL NOT NULL
+    );
+
+    CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER NOT NULL,
+        amount REAL NOT NULL,
+        type TEXT NOT NULL,
+        category TEXT NOT NULL,
+        description TEXT NOT NULL,
+        date TEXT NOT NULL,
+        FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );
+`);
+
+console.log("Database initialized successfully!");
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -19,9 +53,7 @@ app.use(session({
 
 // Routes
 
-// Redirect to login if not logged in
 app.get("/", (req, res) => res.redirect("/login"));
-
 app.get("/login", (req, res) => res.sendFile(path.join(__dirname, "public/login.html")));
 app.get("/register", (req, res) => res.sendFile(path.join(__dirname, "public/register.html")));
 
