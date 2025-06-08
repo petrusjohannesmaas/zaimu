@@ -9,19 +9,40 @@
     <h2>Welcome, <span id="username"></span>!</h2>
     <h4>Your estimated income: <span id="est_income"></span></h4>
     <h4>Your savings goal: <span id="savings_goal"></span></h4>
-    <!-- <p>Log your mindset below:</p>
-
-    <form id="postForm">
-        <textarea name="description" placeholder="How are you feeling?" required></textarea>
-        <select name="mood">
-            <option value="1">😞 1 - Very Low</option>
-            <option value="2">😐 2 - Low</option>
-            <option value="3">🙂 3 - Neutral</option>
-            <option value="4">😊 4 - Good</option>
-            <option value="5">😃 5 - Very Good</option>
-        </select>
-        <button type="submit">Save Post</button>
-    </form> -->
+    <hr>
+    <p><strong>Create a new transaction:</strong></p>
+    <form id="transaction-form">
+        <label>Amount: <input type="number" name="amount" required></label>
+        <label>Type:
+            <select name="type">
+                <option>Needs</option>
+                <option>Wants</option>
+                <option>Savings</option>
+                <option>Unexpected</option>
+            </select>
+        </label>
+        <label>Category:
+            <select name="category">
+                <option>Housing</option>
+                <option>Transportation</option>
+                <option>Food</option>
+                <option>Utilities</option>
+                <option>Clothing</option>
+                <option>Medical/Healthcare</option>
+                <option>Insurance</option>
+                <option>Household Items/Supplies</option>
+                <option>Personal</option>
+                <option>Debt</option>
+                <option>Retirement</option>
+                <option>Education</option>
+                <option>Savings</option>
+                <option>Gifts/Donations</option>
+                <option>Entertainment</option>
+            </select>
+        </label>
+        <label>Description: <input type="text" name="description" required></label>
+        <button type="submit">Save Transaction</button>
+    </form>
 
     <button onclick="logout()">Log Out</button>
 
@@ -38,22 +59,24 @@
                 }
             });
 
-        // document.getElementById("postForm").addEventListener("submit", async (event) => {
-        //     event.preventDefault();
-        //     const formData = new FormData(event.target);
-        //     const encodedData = new URLSearchParams(formData).toString(); // Encode properly
-
-        //     await fetch("/add-post", {
-        //         method: "POST",
-        //         headers: { "Content-Type": "application/x-www-form-urlencoded" }, // Ensure correct format
-        //         body: encodedData
-        //     });
-
-        //     alert("Post saved!");
-        // });
-
         function logout() {
             fetch("/logout", { method: "POST" }).then(() => window.location.href = "/login");
-        }
+        };
+
+        document.getElementById("transaction-form").addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            formData.append("date", new Date().toISOString().split("T")[0]); // Capture current date
+
+            await fetch("/add-transaction", {
+                method: "POST",
+                body: new URLSearchParams(formData),
+                headers: { "Content-Type": "application/x-www-form-urlencoded" }
+            });
+
+            alert("Transaction saved!");
+        });
+
+        
     </script>
 </body>

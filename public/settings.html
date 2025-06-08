@@ -1,0 +1,19 @@
+<form id="settings-form">
+    <label>Estimated Income: <input type="number" name="est_income" required></label>
+    <label>Savings Goal: <input type="number" name="savings_goal" required></label>
+    <button type="submit">Update</button>
+</form>
+<script>
+    document.getElementById("settings-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+
+        await fetch("/update-settings", {
+            method: "POST",
+            body: new URLSearchParams(formData),
+            headers: { "Content-Type": "application/x-www-form-urlencoded" }
+        });
+
+        window.location.href = "/home";
+    });
+</script>

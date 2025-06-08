@@ -65,4 +65,35 @@ app.post("/logout", (req, res) => {
     req.session.destroy(() => res.redirect("/login"));
 });
 
+app.get("/settings", (req, res) => {
+    if (!req.session.username) return res.redirect("/login");
+    res.sendFile(path.join(__dirname, "public/settings.html"));
+});
+
+app.post("/update-settings", (req, res) => {
+    if (!req.session.username) return res.status(401).send("Unauthorized");
+
+    const { est_income, savings_goal } = req.body;
+    db.prepare("UPDATE users SET est_income = ?, savings_goal = ? WHERE username = ?")
+        .run(est_income, savings_goal, req.session.username);
+
+    res.redirect("/home");
+});
+
+app.post("/add-transaction", (req, res) => {
+    if (!req.session.username) return res.status(401).send("Unauthorized");
+
+    const { amount, type, category, description, date } = req.body;
+    const user = db.prepare("SELECT id FROM users WHERE username = ?").get(req.session.username);
+
+    db.prepare(`
+        INSERT INTO transactions (user_id, amount, type, category, description, date)
+        VALUES (?, ?, ?, ?, ?, ?)
+    `).run(user.id, amount, type, category, description, date);
+
+    res.send("Transaction saved!");
+});
+
+
+
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));
