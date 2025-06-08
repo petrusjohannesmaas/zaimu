@@ -108,6 +108,19 @@ app.get("/metrics", (req, res) => {
     res.sendFile(path.join(__dirname, "public/metrics.html"));
 });
 
+app.get("/get-transactions/:month", (req, res) => {
+    if (!req.session.username) return res.status(401).send("Unauthorized");
+
+    const { month } = req.params;
+    const user = db.prepare("SELECT id FROM users WHERE username = ?").get(req.session.username);
+
+    const transactions = db.prepare(`
+        SELECT amount, type, category, date FROM transactions 
+        WHERE user_id = ? AND strftime('%m', date) = ?
+    `).all(user.id, month);
+
+    res.json(transactions);
+});
 
 
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));
