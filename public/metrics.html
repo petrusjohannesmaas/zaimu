@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics</title>
+</head>
+<body>
+    <table>
+    <thead>
+        <tr>
+            <th>Amount</th>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Description</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody id="transaction-list"></tbody>
+</table>
+
+<script>
+    fetch("/get-transactions")
+        .then(res => res.json())
+        .then(transactions => {
+            const tableBody = document.getElementById("transaction-list");
+            tableBody.innerHTML = transactions.map(tx => `
+                <tr>
+                    <td>${tx.amount}</td>
+                    <td>${tx.type}</td>
+                    <td>${tx.category}</td>
+                    <td>${tx.description}</td>
+                    <td>${tx.date}</td>
+                </tr>
+            `).join("");
+        });
+</script>
+
+</body>
+</html>

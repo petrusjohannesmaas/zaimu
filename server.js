@@ -94,6 +94,20 @@ app.post("/add-transaction", (req, res) => {
     res.send("Transaction saved!");
 });
 
+app.get("/get-transactions", (req, res) => {
+    if (!req.session.username) return res.status(401).send("Unauthorized");
+
+    const user = db.prepare("SELECT id FROM users WHERE username = ?").get(req.session.username);
+    const transactions = db.prepare("SELECT amount, type, category, description, date FROM transactions WHERE user_id = ? ORDER BY date DESC").all(user.id);
+
+    res.json(transactions);
+});
+
+app.get("/metrics", (req, res) => {
+    if (!req.session.username) return res.redirect("/login");
+    res.sendFile(path.join(__dirname, "public/metrics.html"));
+});
+
 
 
 app.listen(3000, () => console.log("Server running at http://localhost:3000"));
