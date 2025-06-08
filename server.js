@@ -128,7 +128,7 @@ app.get("/export-csv/:month", (req, res) => {
 
     const { month } = req.params;
     const user = db.prepare("SELECT id FROM users WHERE username = ?").get(req.session.username);
-    
+
     const transactions = db.prepare(`
         SELECT amount, type, category, description, date FROM transactions
         WHERE user_id = ? AND strftime('%m', date) = ?
@@ -136,8 +136,16 @@ app.get("/export-csv/:month", (req, res) => {
 
     if (transactions.length === 0) return res.status(404).send("No transactions found.");
 
-    const csv = json2csv.parse(transactions); // Convert transactions to CSV
-    res.setHeader("Content-Disposition", `attachment; filename=expenses_${month}.csv`);
+    // 🔹 Convert numeric month to full name
+    const monthNames = {
+        "01": "January", "02": "February", "03": "March", "04": "April",
+        "05": "May", "06": "June", "07": "July", "08": "August",
+        "09": "September", "10": "October", "11": "November", "12": "December"
+    };
+    const monthName = monthNames[month] || "Unknown Month";
+
+    const csv = json2csv.parse(transactions);
+    res.setHeader("Content-Disposition", `attachment; filename=expenses_${monthName}.csv`);
     res.setHeader("Content-Type", "text/csv");
     res.send(csv);
 });
